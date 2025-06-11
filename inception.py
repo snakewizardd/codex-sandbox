@@ -8,7 +8,16 @@ But here's the twist - make it go THREE levels deep.
 
 def main():
     print("Level 0: Starting inception...")
-    # TODO: Generate code that generates code that generates code
+
+    def generate_inception_code(levels: int = 3) -> str:
+        """Return Python code that nests ``levels`` exec calls."""
+        code = 'print("We need to go deeper!")'
+        for _ in range(levels):
+            code = f'code = {repr(code)}\nexec(code)'
+        return code
+
+    inception_code = generate_inception_code()
+    exec(inception_code)
     
 if __name__ == "__main__":
     main()
