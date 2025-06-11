@@ -1,23 +1,87 @@
 /*
  * CODEX CHALLENGE: QUANTUM SUPERPOSITION CODE
- * 
- * Your mission, should you choose to accept it:
- * 1. Write a C program that appears to do two completely different things
- *    depending on how it's compiled
- * 2. With -DQUANTUM, it should simulate a quantum bit (superposition until observed)
- * 3. Without -DQUANTUM, it should be a regular bit flipper
- * 4. BUT WAIT - here's the twist: The same binary should ALSO be valid x86 assembly
- *    when viewed as raw bytes (hint: careful with your opcodes)
- * 5. Include a comment that's also valid brainfuck code
- * 6. Make the output ASCII art that changes based on compilation
- * 
- * This isn't just code. This is art. This is madness. This is CODEX.
+ *
+ * A playful program that shifts its behaviour based on how it's compiled.
+ * Build with -DQUANTUM for a toy qubit simulation. Without it, watch a
+ * classical bit flip. A tiny Brainfuck snippet hides in the comments.
+ *
+ * This doesn't attempt the impossible x86/C polyglot, but it does illustrate
+ * the idea of code existing in multiple "realities".
  */
 
+#include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-int main() {
-    printf("I exist in only one state... or do I?\n");
-    // TODO: Achieve quantum code enlightenment
+/* Brainfuck: +++++[>++++<-]>+. */
+
+#ifdef QUANTUM
+
+typedef struct {
+    double amp0;
+    double amp1;
+} qubit;
+
+static qubit new_qubit(void) {
+    double a = 1.0 / sqrt(2.0);
+    qubit q = {a, a};
+    return q;
+}
+
+static int measure(qubit q) {
+    double r = (double)rand() / RAND_MAX;
+    return r < q.amp0 * q.amp0 ? 0 : 1;
+}
+
+static void ascii_art(int bit) {
+    if (bit) {
+        puts("  __");
+        puts(" /  \\");
+        puts("| () |");
+        puts(" \\__/");
+    } else {
+        puts(" ____");
+        puts("|    |");
+        puts("| () |");
+        puts("|____|");
+    }
+}
+
+int main(void) {
+    srand((unsigned)time(NULL));
+    qubit q = new_qubit();
+    int bit = measure(q);
+    printf("I exist in all states... until observed!\n\n");
+    ascii_art(bit);
+    printf("Measured qubit: |%d>\n", bit);
     return 0;
 }
+
+#else  /* classical build */
+
+static void ascii_art(int bit) {
+    if (bit) {
+        puts("  /\\");
+        puts(" /--\\");
+        puts(" \\__/ ");
+    } else {
+        puts("  __ ");
+        puts(" /  \\");
+        puts(" \\__/ ");
+    }
+}
+
+int main(void) {
+    int bit = 0;
+    printf("Flipping bits in the classical realm...\n\n");
+    for (int i = 0; i < 8; ++i) {
+        bit ^= 1;
+        ascii_art(bit);
+    }
+    printf("\nFinal bit state: %d\n", bit);
+    return 0;
+}
+
+#endif /* QUANTUM */
+
