@@ -8,26 +8,50 @@ This script has multiple bugs. Can you:
 """
 
 def calculate_average(numbers):
+    """Return the average of ``numbers``.
+
+    Bug fix: dividing by ``len(numbers)`` when the list is empty causes a
+    ``ZeroDivisionError``. Handle the empty input by returning ``0``.
+    """
     total = 0
     for num in numbers:
         total += num
+    if not numbers:
+        return 0
     return total / len(numbers)
 
 def find_maximum(items):
-    max_val = 0
-    for item in items:
+    """Return the largest value in ``items``.
+
+    Bug fix: ``max_val`` was initialised to ``0`` so lists containing only
+    negative numbers would incorrectly return ``0``. Start with the first item
+    instead and handle empty lists.
+    """
+    if not items:
+        raise ValueError("items cannot be empty")
+    max_val = items[0]
+    for item in items[1:]:
         if item > max_val:
             max_val = item
     return max_val
 
 def reverse_string(text):
-    reversed = ""
+    """Return ``text`` reversed.
+
+    Bug fix: the function attempted to return ``reverse`` which does not exist.
+    Also renamed the accumulator variable to avoid shadowing Python's built-in
+    ``reversed``.
+    """
+    reversed_text = ""
     for i in range(len(text)):
-        reversed = text[i] + reversed
-    return reverse
+        reversed_text = text[i] + reversed_text
+    return reversed_text
 
 if __name__ == "__main__":
     # Test the functions
-    print(calculate_average([]))  # This will crash
-    print(find_maximum([-5, -10, -1]))  # Wrong answer
-    print(reverse_string("Codex"))  # NameError
+    # Empty list should now return 0 instead of crashing
+    print(calculate_average([]))
+    # Should correctly handle negative numbers and return -1
+    print(find_maximum([-5, -10, -1]))
+    # Should no longer raise a NameError
+    print(reverse_string("Codex"))
